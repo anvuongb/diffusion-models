@@ -19,6 +19,7 @@ class Diffusion:
         self.beta_end = beta_end
         self.img_size = img_size
         self.device = device
+        print("image_size", self.img_size)
 
         self.beta = self.prepare_noise_schedule().to(device)
         self.alpha = 1. - self.beta
@@ -30,6 +31,9 @@ class Diffusion:
     def noise_images(self, x, t):
         sqrt_alpha_hat = torch.sqrt(self.alpha_hat[t])[:, None, None, None]
         sqrt_one_minus_alpha_hat = torch.sqrt(1 - self.alpha_hat[t])[:, None, None, None]
+        # if torch.randn() < 0:
+        #     torch.manual_seed(0) # 50% time use deterministic noise, what's gonna happen?
+        torch.manual_seed(0)
         Ɛ = torch.randn_like(x)
         return sqrt_alpha_hat * x + sqrt_one_minus_alpha_hat * Ɛ, Ɛ
 
@@ -97,9 +101,9 @@ def launch():
     args = parser.parse_args()
     args.run_name = "DDPM_Uncondtional"
     args.epochs = 500
-    args.batch_size = 12
+    args.batch_size = 8
     args.image_size = 64
-    args.dataset_path = r"C:\Users\dome\datasets\landscape_img_folder"
+    args.dataset_path = "/media/anvuong/shared/datasets/imagenet"
     args.device = "cuda"
     args.lr = 3e-4
     train(args)
